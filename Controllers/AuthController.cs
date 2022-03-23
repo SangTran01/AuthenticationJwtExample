@@ -13,7 +13,7 @@ namespace AuthenticationJwtExample.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
+        public static User user = new User(); // add static to save between requests
 
         private readonly IConfiguration _configuration;
 
@@ -76,8 +76,15 @@ namespace AuthenticationJwtExample.Controllers
         {
             //add claims check user properties
             List<Claim> claims = new List<Claim>() { 
-                new Claim(ClaimTypes.NameIdentifier, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName)
             };
+
+            if (user.UserName != "admin") {
+                claims.Add(new Claim(ClaimTypes.Role, "Regular"));
+                
+            } else {
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            }
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")));
 
